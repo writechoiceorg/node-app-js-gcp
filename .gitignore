@@ -12,7 +12,28 @@ MODULE.bazel.lock
 # Symlinks created by Bazel into the output tree
 /bazel-*
 
-
+# Node.js
 node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+.npm/
+.pnpm-store/
 
+# Bazel
+bazel-out/
+bazel-testlogs/
+bazel-bin/
+bazel-genfiles/
+.bazel_cache/
 
+# Aspect CLI
+.aspect/
+
+# General
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
