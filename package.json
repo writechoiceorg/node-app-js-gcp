@@ -1,0 +1,17 @@
+{
+  "name": "node-app-gcp",
+  "private": true,
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "eslint": "^9",
+    "prettier": "^3",
+    "typescript": "5.9.2",
+    "typescript-eslint": "^8"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

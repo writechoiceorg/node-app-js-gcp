@@ -1,0 +1,15 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+
+filegroup(
+    name = "data",
+    srcs = ["index.html"],
+)
+
+js_binary(
+    name = "devserver",
+    data = [
+        ":data",
+        "//:node_modules/express",
+    ],
+    entry_point = "devserver.js",
+)
