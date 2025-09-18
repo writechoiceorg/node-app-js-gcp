@@ -37,3 +37,13 @@ bazel-genfiles/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Arquivos de estado e cache do Terraform
+.terraform/
+!*.terraform.lock.hcl # Exceção: queremos o arquivo de lock na raiz
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Diretórios de módulos baixados
+**/modules/
