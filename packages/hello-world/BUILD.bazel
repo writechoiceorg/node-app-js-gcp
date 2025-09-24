@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@aspect_rules_js//js:defs.bzl", "js_binary")
 
 filegroup(
@@ -12,4 +13,18 @@ js_binary(
         "//:node_modules/express",
     ],
     entry_point = "devserver.js",
+)
+
+sh_test(
+    name = "devserver_test",
+    srcs = ["//:jest_bin"],
+    data = [
+        "//:jest_config", # Adicione esta linha!
+        "devserver.test.js",
+        "devserver.js",
+        ":data",
+        "//:node_modules/jest",
+        "//:node_modules/supertest",
+        "//:node_modules/express",
+    ],
 )
