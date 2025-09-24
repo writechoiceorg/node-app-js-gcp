@@ -5,7 +5,7 @@ configure:
     - .aspect/cli/package-json-scripts.star
 lint:
   aspects:
-    - //tools/lint:linters.bzl%eslint
+    - //packages/hello-world:devserver
 
 plugins:
     - name: fix-visibility
