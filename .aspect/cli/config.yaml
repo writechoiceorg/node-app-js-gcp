@@ -1,13 +1,8 @@
-configure:
-  languages:
-    javascript: true
-  plugins:
-    - .aspect/cli/package-json-scripts.star
-lint:
-  aspects:
-    - //packages/hello-world:devserver
+# .aspect/workflows/config.yaml
+# Consulte o guia de Configuração para o conteúdo típico.
+# Para warming, você precisará adicionar 'warming:' em 'tasks:'.
 
-plugins:
-    - name: fix-visibility
-      from: github.com/aspect-build/plugin-fix-visibility
-      version: v0.1.0
+tasks:
+  # Você pode adicionar outras tarefas, como 'format:', 'lint:', etc.
+  # Se estiver configurando 'warming', adicione:
+  # - warming:

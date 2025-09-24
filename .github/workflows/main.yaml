@@ -1,0 +1,31 @@
+name: CI Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build_and_test:
+    runs-on: [self-hosted, aspect-workflows, default] # Use suas labels de runner
+    steps:
+      # O primeiro passo para configurar o ambiente do Workflows
+      - name: Workflows environment
+        run: /etc/aspect/workflows/bin/configure_workflows_env
+        env:
+          ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
+
+      - uses: actions/checkout@v4
+      
+      # Verificação de saúde do agente (opcional, mas recomendado)
+      - name: Agent health check
+        run: /etc/aspect/workflows/bin/agent_health_check
+        env:
+          ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
+
+      # Executa a tarefa Workflows (exemplo: build, test)
+      - name: Run Build and Test
+        uses: aspect-build/workflows-action@<Versão Atual> # Use a versão estável mais recente
+        with:
+          task: build # Defina a tarefa conforme configurado no config.yaml
+          workspace: "." # O diretório do workspace Bazel
