@@ -6,11 +6,12 @@ locals {
 module "aspect_workflows" {
   customer_id = local.customer_id
 
-source = "https://static.aspect.build/aspect/5.14.9/terraform-gcp-aspect-workflows.zip"
+source = "https://static.aspect.build/aspect/5.14.12/terraform-gcp-aspect-workflows.zip"
 
   network    = google_compute_network.workflows_network.id
   subnetwork = google_compute_subnetwork.workflows_subnet.id
   zones   = local.zones
+  
   k8s_cluster = {
     # WORKFLOWS_TEMPLATE: Large builds that with heavy remote cache usage may need a larger node pool
     # for scaling the remote cache frontend.

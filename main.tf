@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.4.0"
 
   backend "gcs" {
-    bucket = "aspect-test"
+    bucket = "aspect-tests"
     prefix = "terraform/state"
   }
 }
@@ -14,7 +14,6 @@ locals {
   zones = [
     "${local.region}-a",
     "${local.region}-b",
-    "${local.region}-c",
   ]
 }
 
