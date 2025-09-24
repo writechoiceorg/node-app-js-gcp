@@ -1,8 +1,8 @@
 # .aspect/workflows/config.yaml
-# Consulte o guia de Configuração para o conteúdo típico.
-# Para warming, você precisará adicionar 'warming:' em 'tasks:'.
 
 tasks:
-  # Você pode adicionar outras tarefas, como 'format:', 'lint:', etc.
-  # Se estiver configurando 'warming', adicione:
-  # - warming:
+  - build:
+      # O campo 'targets' lista os alvos (labels) do Bazel que o Workflows
+      # deve construir quando a tarefa 'build' for executada.
+      targets:
+        - "//packages/hello-world:devserver"
