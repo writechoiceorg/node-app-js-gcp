@@ -16,16 +16,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 🚨 FIX: Using numerical tag @6 for CLI setup.
+      # 🚨 FIX: Using the commit SHA and '/action' path for the CLI setup.
+      # REPLACE <CLI_COMMIT_SHA> with the actual 40-character hash.
       - name: Set up Bazel and Aspect CLI
-        uses: aspect-build/aspect-cli@6 
+        uses: aspect-build/aspect-cli/action@<CLI_COMMIT_SHA> 
 
       - name: Configure Workflows Environment
         run: echo "Configuring environment..."
 
-      # 🚨 FIX: Using numerical tag @1 for Workflows action.
+      # 🚨 FIX: Using the commit SHA and '/action' path for the Workflows action.
+      # REPLACE <WORKFLOWS_COMMIT_SHA> with the actual 40-character hash.
       - name: Run Aspect Build for Devserver
-        uses: aspect-build/workflows-action@1 
+        uses: aspect-build/workflows-action/action@<WORKFLOWS_COMMIT_SHA> 
         with:
           task: build 
           workspace: "node_app_gcp"
