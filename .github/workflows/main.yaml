@@ -1,6 +1,5 @@
 name: Aspect Build - Devserver
 
-# Trigger the workflow on pushes to the main branch and allow manual runs
 on:
   push:
     branches:
@@ -9,30 +8,24 @@ on:
 
 jobs:
   build_devserver:
-    # Using a GitHub-hosted runner
     runs-on: ubuntu-latest 
     
     steps:
-      # 1. Checkout the code (Standard practice)
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2. FIX: Set up Aspect CLI (Uses the required '/action' subdirectory and '@main' branch)
+      # FIX: Using stable tag @v6 for CLI setup.
       - name: Set up Bazel and Aspect CLI
-        # Confirmed path based on repository structure
-        uses: aspect-build/aspect-cli/action@main 
+        uses: aspect-build/aspect-cli@v6 
 
-      # 3. Configure Workflows Environment (Placeholder)
       - name: Configure Workflows Environment
         run: echo "Configuring environment..."
 
-      # 4. FIX: Run Aspect Build for Devserver (Uses the required '/action' subdirectory and '@main' branch)
+      # FIX: Using stable tag @v1 for Workflows action.
       - name: Run Aspect Build for Devserver
-        # 🚨 NEW CORRECTION: Applying the same '/action' path fix to this action 
-        uses: aspect-build/workflows-action/action@main 
+        uses: aspect-build/workflows-action@v1 
         with:
           task: build 
-          # Corrected to point to the directory containing WORKSPACE.bazel
           workspace: "node_app_gcp"
