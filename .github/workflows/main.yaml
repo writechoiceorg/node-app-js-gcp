@@ -22,7 +22,7 @@ jobs:
       # 2. 🚀 FIX: Using the correct official action to set up the CLI/rosetta
       - name: Set up Bazel and Aspect CLI
         # 🚨 Changed from setup-bazel to cli-action
-        uses: aspect-build/cli-action@v1 
+        uses: aspect-build/aspect-cli@v1 
 
       # 3. Configure Workflows Environment (Your placeholder step)
       - name: Configure Workflows Environment
