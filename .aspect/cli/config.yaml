@@ -1,6 +1,4 @@
-# .aspect/cli/config.yaml
-
-tasks:
-  - build:
-      targets:
-        - "//packages/hello-world:devserver"
+jobs:
+    aspect-workflows:
+        name: Aspect Workflows
+        uses: writechoiceorg/workflows-action/.github/workflows/.aspect-workflows-reusable.yaml@5.14.14
