@@ -16,16 +16,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      # FIX: Using stable tag @v6 for CLI setup.
+      # 🚨 FIX: Using numerical tag @6 for CLI setup.
       - name: Set up Bazel and Aspect CLI
-        uses: aspect-build/aspect-cli@v6 
+        uses: aspect-build/aspect-cli@6 
 
       - name: Configure Workflows Environment
         run: echo "Configuring environment..."
 
-      # FIX: Using stable tag @v1 for Workflows action.
+      # 🚨 FIX: Using numerical tag @1 for Workflows action.
       - name: Run Aspect Build for Devserver
-        uses: aspect-build/workflows-action@v1 
+        uses: aspect-build/workflows-action@1 
         with:
           task: build 
           workspace: "node_app_gcp"
