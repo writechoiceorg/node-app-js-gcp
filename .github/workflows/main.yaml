@@ -11,7 +11,7 @@ on:
 jobs:
   build_devserver:
     # 🏃 Define your runner group
-    runs-on: [self-hosted, aspect-workflows, default] 
+    runs-on: ubuntu-latest 
     
     # 📝 Steps in your job
     steps:
