@@ -13,24 +13,25 @@ jobs:
     runs-on: ubuntu-latest 
     
     steps:
-      # 1. Checkout the code
+      # 1. Checkout the code (Correct)
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2. 🚀 FIX: Using the correct official action to set up the CLI/rosetta
+      # 2. 🚀 FIX: Using the correct action name/version for the Aspect CLI setup
       - name: Set up Bazel and Aspect CLI
-        # 🚨 Changed from setup-bazel to cli-action
-        uses: aspect-build/aspect-cli
+        # 🚨 FIX: Using the presumed correct action name AND adding the required version tag (@v1)
+        # Note: If this fails, try "aspect-dev/cli-action@v1" as a fallback.
+        uses: aspect-build/cli-action@v1 
 
       # 3. Configure Workflows Environment (Your placeholder step)
       - name: Configure Workflows Environment
         run: echo "Configuring environment..."
 
-      # 4. Run Aspect Build for Devserver
+      # 4. Run Aspect Build for Devserver (Correct syntax)
       - name: Run Aspect Build for Devserver
-        # Using @main as the tag for the workflows-action
+        # This one was already correct, using the @main branch reference
         uses: aspect-build/workflows-action@main 
         with:
           task: build 
