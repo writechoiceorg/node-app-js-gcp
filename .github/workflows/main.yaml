@@ -19,19 +19,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 2. 🚀 FIX: Using the correct action name/version for the Aspect CLI setup
+      # 2. 🚀 FINAL FIX: Using the exact name from the repository URL and adding the required version tag.
       - name: Set up Bazel and Aspect CLI
-        # 🚨 FIX: Using the presumed correct action name AND adding the required version tag (@v1)
-        # Note: If this fails, try "aspect-dev/cli-action@v1" as a fallback.
-        uses: aspect-build/cli-action@v1 
+        # 🚨 FINAL CORRECTED NAME: aspect-build/aspect-cli@v1 
+        uses: aspect-build/aspect-cli@v1 
 
       # 3. Configure Workflows Environment (Your placeholder step)
       - name: Configure Workflows Environment
         run: echo "Configuring environment..."
 
-      # 4. Run Aspect Build for Devserver (Correct syntax)
+      # 4. Run Aspect Build for Devserver (Using @main which you confirmed works)
       - name: Run Aspect Build for Devserver
-        # This one was already correct, using the @main branch reference
         uses: aspect-build/workflows-action@main 
         with:
           task: build 
