@@ -34,7 +34,7 @@ jobs:
       # --- Aspect Build Step ---
 
       - name: Run Aspect Build for Devserver
-        uses: aspect-build/workflows-action@v1 # It's better to use a specific tag like v1
+        uses: aspect-build/workflows-action@main # It's better to use a specific tag like v1
         with:
           # 'task: build' points to the 'build:' configuration in your config.yaml
           task: build 
