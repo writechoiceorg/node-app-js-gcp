@@ -1,8 +1,6 @@
-# .aspect/workflows/config.yaml
+# .aspect/cli/config.yaml
 
 tasks:
   - build:
-      # O campo 'targets' lista os alvos (labels) do Bazel que o Workflows
-      # deve construir quando a tarefa 'build' for executada.
       targets:
         - "//packages/hello-world:devserver"
