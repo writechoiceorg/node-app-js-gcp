@@ -9,21 +9,20 @@ on:
 
 jobs:
   build_devserver:
-    # Changed to use a GitHub-hosted runner (ubuntu-latest)
+    # Using a GitHub-hosted runner
     runs-on: ubuntu-latest 
     
     steps:
       # 1. Checkout the code
       - name: Checkout Repository
         uses: actions/checkout@v4
-        # Needed for Bazel/Aspect commands that rely on git history
         with:
           fetch-depth: 0
 
-      # 2. Add: Set up the Bazel/Aspect CLI environment
-      # This step installs the required Bazel and Aspect CLI executables (like 'rosetta')
+      # 2. 🚀 FIX: Using the correct official action to set up the CLI/rosetta
       - name: Set up Bazel and Aspect CLI
-        uses: aspect-build/setup-bazel@v1 
+        # 🚨 Changed from setup-bazel to cli-action
+        uses: aspect-build/cli-action@v1 
 
       # 3. Configure Workflows Environment (Your placeholder step)
       - name: Configure Workflows Environment
@@ -34,7 +33,6 @@ jobs:
         # Using @main as the tag for the workflows-action
         uses: aspect-build/workflows-action@main 
         with:
-          # Targets the 'build' task in your .aspect/workflows/config.yaml
           task: build 
           # Corrected to point to the directory containing WORKSPACE.bazel
           workspace: "node_app_gcp"
