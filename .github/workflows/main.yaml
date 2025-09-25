@@ -1,0 +1,42 @@
+name: Aspect Build - Devserver
+
+# 💡 Trigger the workflow on pushes to the main branch
+on:
+  push:
+    branches:
+      - main
+  # 💡 Optional: Also allow manual runs
+  workflow_dispatch:
+
+jobs:
+  build_devserver:
+    # 🏃 Define your runner group
+    runs-on: [self-hosted, aspect-workflows, default] 
+    
+    # 📝 Steps in your job
+    steps:
+      # --- Essential Initialization Steps ---
+
+      # 1. Checkout the code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        # We need 'fetch-depth: 0' for many Bazel/Aspect workflows 
+        # that rely on git history (e.g., affected commands).
+        with:
+          fetch-depth: 0
+
+      # 2. Configure the Bazel/Aspect environment (Optional, but often needed)
+      # This step would typically set up caching or configure credentials.
+      # You might replace this with your actual setup logic if you have any.
+      - name: Configure Workflows Environment
+        run: echo "Configuring environment..."
+
+      # --- Aspect Build Step ---
+
+      - name: Run Aspect Build for Devserver
+        uses: aspect-build/workflows-action@v1 # It's better to use a specific tag like v1
+        with:
+          # 'task: build' points to the 'build:' configuration in your config.yaml
+          task: build 
+          # The root directory of your Bazel workspace
+          workspace: "node_app_gcp"
