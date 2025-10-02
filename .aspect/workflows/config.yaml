@@ -1,23 +1,22 @@
 # .aspect/workflows/config.yaml
+
+# Desativa a extensão que está causando o TypeError durante o parsing do rosetta.
+# Esta extensão tenta analisar scripts de package.json, o que é complexo
+# e não é estritamente necessário para rodar as tasks 'build' e 'test' principais.
+extensions:
+  package-json-scripts:
+    enabled: false
+
 tasks:
-  - ci: # Nova tarefa de agregação, chamada pelo main.yaml com task: ci
+  - ci:
       run_tasks: 
         - build
         - test
-        # Opcional: Adicione 'lint' para garantir a qualidade do código antes do merge
-        # - lint 
 
   - build:
-      # Targets para o build do seu devserver
       targets:
         - "//packages/hello-world:devserver"
   
   - test:
-      # Targets para rodar todos os testes no pacote hello-world
       targets:
         - "//packages/hello-world/..."
-  
-extensions:
-  # Desativa temporariamente a extensão package-json-scripts
-  package-json-scripts:
-    enabled: false
