@@ -85,8 +85,7 @@ jobs:
       - name: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].name }}
         uses: aspect-build/workflows-action@5.14.21
         # CORREÇÃO DE SINTAXE: O bloco 'env' é uma chave/valor YAML. A expressão precisa ser o VALOR, não a CHAVE.
-        env:
-          DYNAMIC_SECRETS: ${{ inputs.inherited_secrets != '' && fromJson(steps.process_secrets.outputs.filtered_secrets) || fromJson('{}') }}
+        env: ${{ inputs.inherited_secrets != '' && fromJson(steps.process_secrets.outputs.filtered_secrets) || fromJson('{}') }}
         timeout-minutes: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].timeout_in_minutes }}
         with:
           workspace: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].workspace }}
