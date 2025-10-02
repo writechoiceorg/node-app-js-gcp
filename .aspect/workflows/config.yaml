@@ -2,17 +2,10 @@
 # Estrutura simplificada para evitar o bug de parsing do rosetta 5.14.21.
 
 tasks:
-  - ci: # Tarefa agregada a ser executada pelo reusable workflow
-      run_tasks: 
-        - build # Garante que a tarefa 'build' seja executada
-        - test
-
-  - build:
-      # Target para o build do seu devserver - CORRESPONDE AO SEU COMANDO LOCAL
-      targets:
-        - "//packages/hello-world:devserver"
-  
+  - checkout:
+      update_strategy: rebase
   - test:
+      id: test
       # Targets para rodar todos os testes no pacote hello-world
       targets:
-        - "//packages/hello-world/..."
+        - //...
