@@ -4,11 +4,11 @@
 tasks:
   - ci: # Tarefa agregada a ser executada pelo reusable workflow
       run_tasks: 
-        - build
+        - build # Garante que a tarefa 'build' seja executada
         - test
 
   - build:
-      # Targets para o build do seu devserver
+      # Target para o build do seu devserver - CORRESPONDE AO SEU COMANDO LOCAL
       targets:
         - "//packages/hello-world:devserver"
   

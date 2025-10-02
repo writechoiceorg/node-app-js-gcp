@@ -1,4 +1,4 @@
-name: Aspect Workflows CI
+name: Aspect Workflows CI (Migrated)
 
 on:
   push:
@@ -8,11 +8,84 @@ on:
   workflow_dispatch:
 
 jobs:
-  aspect-workflows:
-    name: Aspect Workflows CI/CD
-    # Invoca o arquivo vendored
-    uses: ./.github/workflows/.aspect-workflows-reusable.yaml
-    with:
-      # Garante que o Job 'setup' (que roda o rosetta steps) use o runner small
-      queue: aspect-small
-    secrets: inherit
+  # 1. Job de Configuração (SETUP)
+  # Este job gera a matriz de execução de jobs a partir do config.yaml
+  setup:
+    name: Setup Aspect Workflows
+    # Usamos o runner pequeno/econômico para esta etapa leve
+    runs-on: [self-hosted, aspect-workflows, aspect-small]
+    env:
+      # O diretório binário é necessário para o script configure_workflows_env
+      ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
+    steps:
+      - name: Workflows environment (Setup)
+        run: ${{ env.ASPECT_WORKFLOWS_BIN_DIR }}/configure_workflows_env
+        
+      - uses: actions/checkout@v4
+        
+      - id: rosetta-generate
+        name: Generate Rosetta Config
+        run: |
+          # Executa o rosetta para gerar a matriz de jobs (build, test)
+          ROSETTA_RESULT=$( \
+            rosetta steps \
+            --config .aspect/workflows/config.yaml \
+            --gha_task generate \
+            --gha_json_pretty_print=false \
+          )
+          # Define a saída que será consumida pelo job 'bazel'
+          tee "${GITHUB_OUTPUT}" <<< "json=${ROSETTA_RESULT}"
+    outputs:
+      cfg: ${{ steps.rosetta-generate.outputs.json }}
+      
+  # 2. Job de Execução das Tarefas Bazel (BAZEL)
+  # Este job consome o output 'cfg' para criar jobs paralelos
+  bazel:
+    needs: [setup]
+    name: ${{ matrix.job }}
+    # Define o runner com base na matriz gerada (ex: aspect-default)
+    runs-on: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].labels }}
+    strategy:
+      fail-fast: false
+      # A matriz é a lista de tarefas definidas no config.yaml (ci, build, test...)
+      matrix: ${{ fromJson(needs.setup.outputs.cfg).matrix_config }}
+      
+    env:
+      ASPECT_WORKFLOWS_CONFIG: .aspect/workflows/config.yaml
+      
+    steps:
+      # As etapas abaixo são baseadas no seu .aspect-workflows-reusable.yaml
+      
+      - name: Workflows environment
+        # Obtém o caminho do binário do output 'cfg' gerado no job 'setup'
+        run: ${{ fromJson(needs.setup.outputs.cfg).platform.directories.WORKFLOWS_BIN_DIR }}/configure_workflows_env
+      
+      - name: Clone repo
+        uses: actions/checkout@v4
+        with:
+          # Otimização: fetch-depth raso para lint/format/outros. Se a tarefa não for listada, usa 1.
+          fetch-depth: ${{ endsWith(matrix.job, 'lint') && 2 || endsWith(matrix.job, 'format') && 2 || 1 }}
+
+      - name: Agent health check
+        run: RUNNER_TRACKING_ID="" && ${{ fromJson(needs.setup.outputs.cfg).platform.directories.WORKFLOWS_BIN_DIR }}/agent_health_check
+        timeout-minutes: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].health_check_timeout }}
+      
+      - name: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].name }}
+        # Usa a Action do Aspect para rodar a tarefa Bazel correspondente
+        uses: aspect-build/workflows-action@5.14.21
+        timeout-minutes: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].timeout_in_minutes }}
+        with:
+          workspace: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].workspace }}
+          task: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].task }}
+
+      - name: Upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].artifact_prefix }}${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].task }}.artifacts
+          path: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].artifact_upload_pattern }}
+          overwrite: true
+          
+      # NOTA: Outras etapas como 'Process secrets', 'Send notification to Slack', 
+      # 'Delivery manifest', e 'Codecov' também devem ser migradas aqui, 
+      # seguindo o mesmo padrão de acesso às variáveis `fromJson(needs.setup.outputs.cfg)`.
