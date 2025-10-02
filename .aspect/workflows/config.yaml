@@ -1,7 +1,11 @@
 # .aspect/workflows/config.yaml
 tasks:
   - build:
-      # The 'targets' field specifies the list of Bazel labels
-      # that Workflows must build.
+      # O 'targets' é o label do seu alvo Bazel
       targets:
         - "//packages/hello-world:devserver"
+  
+  - test:
+      # Roda todos os testes em //packages/hello-world, incluindo :devserver_test
+      targets:
+        - "//packages/hello-world/..."

@@ -1,33 +1,63 @@
-name: Aspect Build - Devserver
+name: Aspect Workflows CI (Node.js GCP Example)
 
 on:
   push:
     branches:
       - main
+  pull_request: # Incluir Pull Requests é prática recomendada para CI
   workflow_dispatch:
 
 jobs:
-  build_devserver:
-    runs-on: ubuntu-latest 
+  # Job 1: Configuração do Pipeline (usa runner "small")
+  setup:
+    name: Setup Aspect Workflows
+    # O label do runner é 'aspect-small', conforme definido no seu workflows.tf
+    runs-on: [self-hosted, aspect-workflows, aspect-small]
     
+    env:
+      ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
+
     steps:
+      - name: Workflows Environment Setup
+        run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
+        
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+          
+      - name: Generate Pipeline Steps (Rosetta)
+        # Este comando traduz o .aspect/workflows/config.yaml para passos de pipeline
+        uses: aspect-build/workflows-action@v5 # Recomenda-se usar a versão mais recente
+        with:
+          task: rosetta-steps 
+
+  # Job 2: Execução das Tarefas Bazel (usa runner "default")
+  run_tasks:
+    name: Build and Test
+    needs: [setup]
+    # O label do runner é 'aspect-default', conforme definido no seu workflows.tf
+    runs-on: [self-hosted, aspect-workflows, aspect-default]
+    
+    env:
+      ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
+
+    steps:
+      - name: Workflows Environment Setup
+        # Precisa ser re-executado no novo runner
+        run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
+        
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - name: Agent Health Check
+        run: ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
 
-      # 🚨 FIX: Using the commit SHA and '/action' path for the CLI setup.
-      # REPLACE <CLI_COMMIT_SHA> with the actual 40-character hash.
-      - name: Set up Bazel and Aspect CLI
-        uses: aspect-build/aspect-cli/action@<CLI_COMMIT_SHA> 
-
-      - name: Configure Workflows Environment
-        run: echo "Configuring environment..."
-
-      # 🚨 FIX: Using the commit SHA and '/action' path for the Workflows action.
-      # REPLACE <WORKFLOWS_COMMIT_SHA> with the actual 40-character hash.
-      - name: Run Aspect Build for Devserver
-        uses: aspect-build/workflows-action/action@<WORKFLOWS_COMMIT_SHA> 
+      - name: Run Bazel Tasks (Build & Test)
+        # Executa as tarefas 'build' e 'test' conforme definido no seu .aspect/workflows/config.yaml
+        uses: aspect-build/workflows-action@v5 
         with:
-          task: build 
+          task: ci 
           workspace: "node_app_gcp"
