@@ -1,11 +1,5 @@
 # .aspect/workflows/config.yaml
 
-extensions:
-  package-json-scripts:
-    enabled: false
-  rules_shell:
-    enabled: false
-
 tasks:
   - build:
       name: "Build DevServer"
