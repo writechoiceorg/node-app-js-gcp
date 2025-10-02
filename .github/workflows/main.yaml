@@ -9,8 +9,7 @@ on:
 
 jobs:
   run_ci:
-    name: Run Build Only (Bypassing Rosetta Bug)
-    # Usamos o runner default que está a funcionar
+    name: Build and Test on Aspect Workflows
     runs-on: [self-hosted, aspect-workflows, aspect-default]
     
     env:
@@ -28,9 +27,9 @@ jobs:
       - name: Agent Health Check
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
 
-      - name: Run Bazel Build
-        # Chamamos APENAS a task 'build' - a unidade de trabalho mais básica.
+      - name: Run Bazel Tasks (CI)
+        # O erro persistiu nesta chamada.
         uses: aspect-build/workflows-action@5.14.21
         with:
-          task: build 
+          task: ci # <--- Esta task falhava internamente ao tentar executar o rosetta
           workspace: "node_app_gcp"
