@@ -17,7 +17,7 @@ tasks:
       targets:
         - "//packages/hello-world/..."
   
-  # Opcional: Adicione a tarefa lint se quiser executar o linter
-  # - lint:
-  #     targets:
-  #       - "//packages/hello-world/..."
+extensions:
+  # Desativa temporariamente a extensão package-json-scripts
+  package-json-scripts:
+    enabled: false
