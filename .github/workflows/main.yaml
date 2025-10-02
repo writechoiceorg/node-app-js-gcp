@@ -3,7 +3,7 @@ name: Aspect Workflows CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, Tests]
   pull_request:
     branches: [main]
   workflow_dispatch:
