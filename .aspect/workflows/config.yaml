@@ -1,11 +1,23 @@
 # .aspect/workflows/config.yaml
 tasks:
+  - ci: # Nova tarefa de agregação, chamada pelo main.yaml com task: ci
+      run_tasks: 
+        - build
+        - test
+        # Opcional: Adicione 'lint' para garantir a qualidade do código antes do merge
+        # - lint 
+
   - build:
-      # O 'targets' é o label do seu alvo Bazel
+      # Targets para o build do seu devserver
       targets:
         - "//packages/hello-world:devserver"
   
   - test:
-      # Roda todos os testes em //packages/hello-world, incluindo :devserver_test
+      # Targets para rodar todos os testes no pacote hello-world
       targets:
         - "//packages/hello-world/..."
+  
+  # Opcional: Adicione a tarefa lint se quiser executar o linter
+  # - lint:
+  #     targets:
+  #       - "//packages/hello-world/..."

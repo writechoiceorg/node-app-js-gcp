@@ -11,6 +11,7 @@ jobs:
   # Job 1: Configuração do Pipeline (usa runner "aspect-small")
   setup:
     name: Setup Aspect Workflows
+    # Labels do runner small, conforme definido no seu workflows.tf
     runs-on: [self-hosted, aspect-workflows, aspect-small]
     
     env:
@@ -18,23 +19,26 @@ jobs:
 
     steps:
       - name: Workflows Environment Setup
+        # O script de setup inicializa o ambiente do Aspect Workflows
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
         
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          # fetch-depth: 0 é importante para ferramentas como git describe e determinismo
           fetch-depth: 0 
           
       - name: Generate Pipeline Steps (Rosetta)
-        # CORREÇÃO APLICADA: Usa a versão explícita 5.14.21
+        # CORREÇÃO APLICADA: Usa a versão explícita 5.14.21 e a task: generate
         uses: aspect-build/workflows-action@5.14.21 
         with:
-          task: rosetta-steps 
+          task: generate # Esta task interna é a correta para gerar os passos (rosetta steps)
 
   # Job 2: Execução das Tarefas Bazel (usa runner "aspect-default")
   run_tasks:
     name: Build and Test
     needs: [setup]
+    # Labels do runner default, conforme definido no seu workflows.tf
     runs-on: [self-hosted, aspect-workflows, aspect-default]
     
     env:
@@ -42,6 +46,7 @@ jobs:
 
     steps:
       - name: Workflows Environment Setup
+        # Configura novamente o ambiente no novo runner de execução
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
         
       - name: Checkout Repository
@@ -50,10 +55,11 @@ jobs:
           fetch-depth: 0
           
       - name: Agent Health Check
+        # Confirma que o runner está a comunicar com o cache remoto
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
 
       - name: Run Bazel Tasks (Build & Test)
-        # CORREÇÃO APLICADA: Usa a versão explícita 5.14.21
+        # Usa a task 'ci' para executar todas as tarefas agregadas no config.yaml
         uses: aspect-build/workflows-action@5.14.21
         with:
           task: ci 
