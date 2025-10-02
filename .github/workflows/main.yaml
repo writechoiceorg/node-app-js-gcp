@@ -9,16 +9,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  # O nome do job não importa, mas ele DEVE ser o único a usar 'uses:'
   call-aspect-workflow:
     name: Aspect Workflows CI/CD
     
-    # 1. Correção do Caminho: Removemos o './' inicial para evitar ambiguidades.
-    # 2. Correção de Estrutura: O 'uses:' agora está no nível correto, dentro de um job.
-    uses: .github/workflows/.aspect-workflows-reusable.yaml
+    # ADICIONE A VERSÃO AQUI usando @${{ github.sha }}
+    uses: ./.github/workflows/.aspect-workflows-reusable.yaml
     with:
-      # O input 'queue' no workflow reutilizável define onde o job 'setup' será executado.
-      queue: aspect-small 
-      
-    # 'secrets: inherit' é essencial para que o runner tenha acesso aos tokens
+      queue: aspect-small
     secrets: inherit
