@@ -1,35 +1,18 @@
-name: Aspect Workflows CI (Node.js GCP Example)
+name: Aspect Workflows CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  run_ci:
-    name: Build and Test on Aspect Workflows
-    runs-on: [self-hosted, aspect-workflows, aspect-default]
-    
-    env:
-      ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
-
-    steps:
-      - name: Workflows Environment Setup
-        run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
-        
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
-      - name: Agent Health Check
-        run: ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
-
-      - name: Run Bazel Tasks (CI)
-        # O erro persistiu nesta chamada.
-        uses: aspect-build/workflows-action@5.14.21
-        with:
-          task: ci # <--- Esta task falhava internamente ao tentar executar o rosetta
-          workspace: "node_app_gcp"
+  aspect-workflows:
+    name: Aspect Workflows CI/CD
+    # Invoca o arquivo vendored
+    uses: ./.github/workflows/.aspect-workflows-reusable.yaml
+    with:
+      # Garante que o Job 'setup' (que roda o rosetta steps) use o runner small
+      queue: aspect-small
+    secrets: inherit

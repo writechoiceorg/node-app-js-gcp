@@ -1,15 +1,18 @@
 # .aspect/workflows/config.yaml
+# Estrutura simplificada para evitar o bug de parsing do rosetta 5.14.21.
 
 tasks:
-  - ci: # Tarefa agregada chamada pelo main.yaml (task: ci)
+  - ci: # Tarefa agregada a ser executada pelo reusable workflow
       run_tasks: 
         - build
         - test
 
   - build:
+      # Targets para o build do seu devserver
       targets:
         - "//packages/hello-world:devserver"
   
   - test:
+      # Targets para rodar todos os testes no pacote hello-world
       targets:
         - "//packages/hello-world/..."
