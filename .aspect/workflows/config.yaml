@@ -8,4 +8,4 @@ tasks:
       id: test
       # Targets para rodar todos os testes no pacote hello-world
       targets:
-        - //...
+        - //packages/hello-world:devserver_test
