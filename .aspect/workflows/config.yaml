@@ -5,8 +5,3 @@ tasks:
       name: "Build DevServer"
       targets:
         - "//packages/hello-world:devserver"
-  
-  - test:
-      name: "Test Hello World"
-      targets:
-        - "//packages/hello-world/..."

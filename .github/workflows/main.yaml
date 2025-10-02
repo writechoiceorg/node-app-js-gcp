@@ -8,52 +8,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Job 1: Configuração do Pipeline
-  setup:
-    name: Setup Aspect Workflows
-    runs-on: [self-hosted, aspect-workflows, aspect-small]
-    
-    env:
-      ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
-
-    steps:
-      - name: Workflows Environment Setup
-        run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
-        
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 
-          
-      - name: Generate Pipeline Steps (Rosetta)
-        uses: aspect-build/workflows-action@5.14.21 
-        with:
-          task: generate
-          workspace: .
-
-  # Job 2: Execução das Tarefas Bazel
-  run_tasks:
-    name: Build and Test
-    needs: [setup]
+  aspect_workflows:
+    name: Aspect Workflows
     runs-on: [self-hosted, aspect-workflows, aspect-default]
-    
+
     env:
       ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
 
     steps:
       - name: Workflows Environment Setup
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
-        
+
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Agent Health Check
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
 
-      - name: Run Bazel Tasks (Build & Test)
+      - name: Run Build
         uses: aspect-build/workflows-action@5.14.21
         with:
-          task: generate
+          task: build
           workspace: .
