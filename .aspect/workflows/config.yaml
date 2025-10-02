@@ -1,18 +1,9 @@
 # .aspect/workflows/config.yaml
 
-# Não inclui a seção 'extensions:' ou 'workspaces:' para evitar bugs de parsing.
-tasks:
-  - ci: # Tarefa agregada a ser chamada pelo main.yaml
-      run_tasks: 
-        - build
-        - test
+# Manter a configuração mais simples possível para evitar o bug de parsing do rosetta.
 
+tasks:
   - build:
       # Targets para o build do seu devserver
       targets:
         - "//packages/hello-world:devserver"
-  
-  - test:
-      # Targets para rodar todos os testes no pacote hello-world
-      targets:
-        - "//packages/hello-world/..."

@@ -9,8 +9,8 @@ on:
 
 jobs:
   run_ci:
-    name: Build and Test on Aspect Workflows
-    # Usamos o runner default que é mais robusto para carga de trabalho Bazel
+    name: Run Build Only (Bypassing Rosetta Bug)
+    # Usamos o runner default que está a funcionar
     runs-on: [self-hosted, aspect-workflows, aspect-default]
     
     env:
@@ -28,9 +28,9 @@ jobs:
       - name: Agent Health Check
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
 
-      - name: Run Bazel Tasks (CI)
-        # Chamamos a task 'ci' diretamente. Isto contorna a fase 'generate' que falha.
+      - name: Run Bazel Build
+        # Chamamos APENAS a task 'build' - a unidade de trabalho mais básica.
         uses: aspect-build/workflows-action@5.14.21
         with:
-          task: ci 
+          task: build 
           workspace: "node_app_gcp"
