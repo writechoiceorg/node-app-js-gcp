@@ -1,7 +1,5 @@
 # .aspect/workflows/config.yaml
 
-# Desativa as extensões que causam TypeError durante o parsing do rosetta.
-# Estas extensões podem ser reativadas individualmente após depuração.
 extensions:
   package-json-scripts:
     enabled: false
@@ -9,17 +7,12 @@ extensions:
     enabled: false
 
 tasks:
-  - ci: # Tarefa de agregação chamada pelo main.yaml
-      run_tasks: 
-        - build
-        - test
-
   - build:
-      # Targets para o build do seu devserver
+      name: "Build DevServer"
       targets:
         - "//packages/hello-world:devserver"
   
   - test:
-      # Targets para rodar todos os testes no pacote hello-world
+      name: "Test Hello World"
       targets:
         - "//packages/hello-world/..."
