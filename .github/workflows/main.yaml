@@ -8,32 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Job 1: Configuração do Pipeline (usa runner "aspect-small")
-  setup:
-    name: Setup Aspect Workflows
-    runs-on: [self-hosted, aspect-workflows, aspect-small]
-    
-    env:
-      ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
-
-    steps:
-      - name: Workflows Environment Setup
-        run: ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
-        
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 
-          
-      - name: Generate Pipeline Steps (Rosetta)
-        uses: aspect-build/workflows-action@5.14.21 
-        with:
-          task: generate
-
-  # Job 2: Execução das Tarefas Bazel (usa runner "aspect-default")
-  run_tasks:
-    name: Build and Test
-    needs: [setup]
+  run_ci:
+    name: Build and Test on Aspect Workflows
+    # Usamos o runner default que é mais robusto para carga de trabalho Bazel
     runs-on: [self-hosted, aspect-workflows, aspect-default]
     
     env:
@@ -51,7 +28,8 @@ jobs:
       - name: Agent Health Check
         run: ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
 
-      - name: Run Bazel Tasks (Build & Test)
+      - name: Run Bazel Tasks (CI)
+        # Chamamos a task 'ci' diretamente. Isto contorna a fase 'generate' que falha.
         uses: aspect-build/workflows-action@5.14.21
         with:
           task: ci 
