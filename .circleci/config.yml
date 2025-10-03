@@ -3,22 +3,16 @@ version: 2.1
 
 jobs:
   aspect-workflows-setup:
-    # 1. SATISFAZ O VALIDADOR: O 'machine: true' satisfaz o requisito de 'executor'
     machine:
-      # O CircleCI espera uma imagem aqui. Usamos uma imagem de referência.
-      # O Runner real será a GCE Instance do Aspect Workflows.
       image: ubuntu-2204:2023.10.1 
     
-    # 2. DIRECIONA O JOB: Esta chave garante que o job vá para o Aspect Runner correto.
-    # 🚨 Substitua 'my-org/aspect-default' pela sua Resource Class.
-    resource_class: my-org/aspect-default 
+    resource_class: writechoiceorg/aspect-default 
     
     steps:
       - checkout
       - run:
           name: "Setup Aspect Workflows and Continue"
           command: |
-            # Este comando gera o resto do pipeline de Bazel.
             rosetta steps | circleci config process - --job aspect-workflows-setup | continue
 
 workflows:
