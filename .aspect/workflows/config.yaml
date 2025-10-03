@@ -9,3 +9,8 @@ tasks:
       # Targets para rodar todos os testes no pacote hello-world
       targets:
         - //packages/hello-world:devserver_test
+  - build:
+      id: build
+      # Targets para construir o pacote hello-world
+      targets:
+        - //packages/hello-world:devserver
