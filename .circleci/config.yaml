@@ -1,14 +1,12 @@
 version: "2.1"
-setup: true # THIS MUST BE PRESENT AND AT THE TOP LEVEL
+setup: true 
 
 orbs:
-  # Replace x.x.x with the actual version of the Orb
   aspect-workflows: aspect-build/workflows@5.8.18
-  # (Optional) Other Orbs you might use
+  # (Optional) Other Orbs
 
 workflows:
   default-workflow:
     jobs:
       - aspect-workflows/setup:
-          # Your configured Resource Class from the CircleCI dashboard
           resource_class: writechoiceorg/aspect-default
