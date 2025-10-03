@@ -1,19 +1,14 @@
 version: "2.1"
-setup: true # ESSENCIAL: Permite que o Orb gere o pipeline completo.
+setup: true # THIS MUST BE PRESENT AND AT THE TOP LEVEL
 
 orbs:
-  # 1. Declare o Orb na seção 'orbs'. Substitua 'x.x.x' pela versão do Orb.
+  # Replace x.x.x with the actual version of the Orb
   aspect-workflows: aspect-build/workflows@5.8.18
-  # (Opcional) Declare outros Orbs que você precise.
+  # (Optional) Other Orbs you might use
 
 workflows:
   default-workflow:
     jobs:
-      # 2. Use o job 'setup' do Orb.
       - aspect-workflows/setup:
-          # Sua Resource Class deve ser a que você criou no painel do CircleCI.
+          # Your configured Resource Class from the CircleCI dashboard
           resource_class: writechoiceorg/aspect-default
-          
-          # (Opcional) Comente ou remova o bloco 'context' se não for usá-lo.
-          # context:
-          #   - slack
