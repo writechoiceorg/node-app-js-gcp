@@ -11,9 +11,21 @@ jobs:
     
     steps:
       - checkout
+      
+      # 🚨 NEW STEP: Install/Update CircleCI CLI
+      - run:
+          name: Install latest CircleCI CLI
+          command: |
+            # Example command to install the latest CircleCI CLI
+            # This ensures the 'pipeline' command is available
+            curl -o /tmp/circleci-cli https://cli.circleci.com/download/latest/circleci-cli-linux-amd64
+            chmod +x /tmp/circleci-cli
+            sudo mv /tmp/circleci-cli /usr/local/bin/circleci
+
       - run:
           name: "Setup Aspect Workflows and Continue"
           command: |
+            # Now, 'circleci pipeline continue' should be recognized.
             rosetta steps | circleci pipeline continue -c - --job aspect-workflows-setup
 
 workflows:
