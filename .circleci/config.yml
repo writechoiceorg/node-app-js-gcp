@@ -3,7 +3,6 @@ setup: true
 
 orbs:
   aspect-workflows: aspect-build/workflows@5.8.18
-  # (Optional) Other Orbs
 
 workflows:
   default-workflow:
