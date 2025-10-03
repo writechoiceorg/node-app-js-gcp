@@ -99,7 +99,7 @@ machine_type = "c2d-standard-4"
   }
 
   # WORKFLOWS_TEMPLATE:
-  hosts = ["gha"]
+  hosts = ["gha", "cci"]
   # Github Actions runner groups
   # WORKFLOWS_TEMPLATE: Once the Aspect Workflows GitHub actions land in your repository, run the following command
   # using the GitHub CLI to determine the workflow ID for the `gha_workflow_ids` fields below:
@@ -142,6 +142,28 @@ machine_type = "c2d-standard-4"
       max_runners            = 1
       min_runners            = 0
       queue                  = "aspect-warming"
+      resource_type          = "default"
+      warming                = false # do not warm runners used to generate warming archives
+    }
+  }
+    # CircleCI runner groups
+  cci_runner_groups = {
+    # The `default` runner group is used for general bazel tasks such as build & test.
+    default = {
+      agent_idle_timeout_min    = 120
+      max_runners               = 50
+      min_runners               = 0
+      resource_type             = "default"
+      scaling_polling_frequency = 2 # check for new jobs every 30s
+      warming                   = true
+    }
+    # The `warming` running group is used for the warming job to create warming
+    # archives used by other runner groups to pre-warm external repositories
+    # during bootstrap in order to speed up their first jobs.
+    warming = {
+      agent_idle_timeout_min = 1
+      max_runners            = 1
+      min_runners            = 0
       resource_type          = "default"
       warming                = false # do not warm runners used to generate warming archives
     }

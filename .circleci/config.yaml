@@ -1,12 +1,20 @@
-version: 2.1
-jobs:
-  build:
-    docker:
-      - image: cimg/base:current
-    resource_class: writechoiceorg/aspect-default
-    steps:
-      - run: echo "Hi I'm on a Container Runner!"
+version: "2.1"
+setup: true # Essencial para permitir que o Orb use o recurso de 'continuation'.
+
+orbs:
+  # 1. Declare o Orb na seção 'orbs'. Substitua 'x.x.x' pela versão do Orb.
+  aspect-workflows: aspect-build/workflows@x.x.x
+  # (Opcional) Declare outros Orbs que você precise, como o do Slack.
+  # slack: circleci/slack@4.12.5
+
 workflows:
-  build-workflow:
+  default-workflow:
     jobs:
-      - build
+      # 2. Use o job 'setup' do Orb na sua seção 'workflows'.
+      - aspect-workflows/setup:
+          # Substitua pelo nome da Resource Class que você criou no Passo 1 da integração.
+          resource_class: writechoiceorg/aspect-default
+          
+          # (Opcional) Se você precisa de acesso a segredos, use o 'context'.
+          # context:
+          #   - slack
