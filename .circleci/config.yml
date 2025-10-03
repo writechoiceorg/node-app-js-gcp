@@ -6,6 +6,7 @@ jobs:
     machine:
       image: ubuntu-2204:2023.10.1 
     
+    # Resource class must be correct: writechoiceorg/aspect-default
     resource_class: writechoiceorg/aspect-default 
     
     steps:
@@ -13,7 +14,7 @@ jobs:
       - run:
           name: "Setup Aspect Workflows and Continue"
           command: |
-            rosetta steps | circleci config process - --job aspect-workflows-setup | continue
+            rosetta steps | circleci pipeline continue -c - --job aspect-workflows-setup
 
 workflows:
   build-and-test:
