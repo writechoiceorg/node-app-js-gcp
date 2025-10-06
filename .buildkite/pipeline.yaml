@@ -1,0 +1,7 @@
+steps:
+    - key: aspect-workflows-setup
+      label: ':aspect-build: Setup Aspect Workflows'
+      commands:
+          - 'rosetta steps | buildkite-agent pipeline upload'
+      agents:
+          queue: aspect-small
