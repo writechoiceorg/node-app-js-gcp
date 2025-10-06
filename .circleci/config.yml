@@ -6,7 +6,6 @@ jobs:
     machine:
       image: ubuntu-2204:2023.10.1 
     
-    # 🚨 CORREÇÃO AQUI! O nome da Resource Class deve ser 'writechoiceorg/aspect-default'
     resource_class: writechoiceorg/aspect-default 
     
     steps:
