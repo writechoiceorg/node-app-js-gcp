@@ -11,7 +11,7 @@ workflows:
 jobs:
   aw-build:
     machine: true
-    resource_class: aspect-build/awd-cci-test-dev-gcp-default
+    resource_class: writechoiceorg/aspect-default
     working_directory: /mnt/ephemeral/workdir
     steps:
       - run:
@@ -67,7 +67,7 @@ jobs:
       XDG_CACHE_HOME: /mnt/ephemeral/caches
   aw-test:
     machine: true
-    resource_class: aspect-build/awd-cci-test-dev-gcp-default
+    resource_class: writechoiceorg/aspect-default
     working_directory: /mnt/ephemeral/workdir
     steps:
       - run:
