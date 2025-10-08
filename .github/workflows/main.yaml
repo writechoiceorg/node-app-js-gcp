@@ -3,7 +3,7 @@ name: Aspect Workflows CI
 
 on:
   push:
-    branches: [main, Tests]
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -11,8 +11,6 @@ on:
 jobs:
   call-aspect-workflow:
     name: Aspect Workflows CI/CD
-    
-    # ADICIONE A VERSÃO AQUI usando @${{ github.sha }}
     uses: ./.github/workflows/.aspect-workflows-reusable.yaml
     with:
       queue: aspect-small
