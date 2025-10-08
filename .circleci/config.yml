@@ -118,4 +118,5 @@ jobs:
       ASPECT_WORKFLOWS_CONFIG: .aspect/workflows/config.yaml
       ASPECT_WORKFLOWS_WORKSPACE: << parameters.workspace >>
       XDG_CACHE_HOME: /mnt/ephemeral/caches
-orbs: {}
+orbs:
+  workflows: aspect-build/workflows@5.8.18
