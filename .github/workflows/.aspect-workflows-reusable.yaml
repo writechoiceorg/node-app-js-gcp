@@ -1,8 +1,49 @@
 # ==================================================================================================
-# Aspect Workflows Reusable Workflow for GitHub Actions v5.14.21
+# Aspect Workflows Reusable Workflow for GitHub Actions v5.15.0
+#
+# https://github.com/aspect-build/workflows-action/blob/5.15.0/.github/workflows/.aspect-workflows-reusable.yaml
+#
+# At this time, GitHub Actions does not allow referencing reusable workflows from public
+# repositories in other organizations. See
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows#access-to-reusable-workflows
+# for more info.
+#
+# Use the Aspect Workflows Reusable Workflow with GitHub Actions by doing one of the following:
+#
+# 1. Vendor this file into the `.github/workflows` folder of your repository and reference it with
+#    `uses:` in a workflow file such as `.github/workflows/aspect-workflows.yaml`:
+#
+#    ```
+#    name: Aspect Workflows
+#
+#    on:
+#      push:
+#        branches: [main]
+#      pull_request:
+#        branches: [main]
+#      workflow_dispatch:
+#
+#    jobs:
+#      aspect-workflows:
+#        name: Aspect Workflows
+#        uses: ./.github/workflows/.aspect-workflows-reusable.yaml
+#    ```
+#
+# 2. Create a fork of https://github.com/aspect-build/workflows-action in your
+#    GitHub org and change the `uses` line above to reference the reusable work
+#    from your fork:
+#
+#    ```
+#    jobs:
+#      aspect-workflows:
+#        name: Aspect Workflows
+#        uses: my-github-org/workflows-action/.github/workflows/.aspect-workflows-reusable.yaml@5.15.0
+#    ```
 # ==================================================================================================
 name: Aspect Workflows Reusable Workflow
 on:
+  # Makes this workflow reusable, see
+  # https://github.blog/2022-02-10-using-reusable-workflows-github-actions
   workflow_call:
     inputs:
       aspect-config:
@@ -25,18 +66,10 @@ on:
         type: string
 jobs:
   setup:
-    # Correção Integrada: Configura o ENV e usa o runner pequeno
     runs-on: [self-hosted, aspect-workflows, "${{ inputs.queue }}"]
-    env:
-      ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
     steps:
-      - name: Workflows environment (Setup)
-        run: ${{ env.ASPECT_WORKFLOWS_BIN_DIR }}/configure_workflows_env
-        
       - uses: actions/checkout@v4
-        
       - id: rosetta-generate
-        name: Generate Rosetta Config
         run: |
           ROSETTA_RESULT=$( \
             rosetta steps \
@@ -47,7 +80,6 @@ jobs:
           tee "${GITHUB_OUTPUT}" <<< "json=${ROSETTA_RESULT}"
     outputs:
       cfg: ${{ steps.rosetta-generate.outputs.json }}
-      
   bazel:
     needs: [setup]
     runs-on: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].labels }}
@@ -56,6 +88,7 @@ jobs:
       matrix: ${{ fromJson(needs.setup.outputs.cfg).matrix_config }}
     env:
       ASPECT_WORKFLOWS_CONFIG: ${{ inputs.aspect-config }}
+      GITHUB_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
     steps:
       - name: Workflows environment
         run: ${{ fromJson(needs.setup.outputs.cfg).platform.directories.WORKFLOWS_BIN_DIR }}/configure_workflows_env
@@ -64,6 +97,9 @@ jobs:
         with:
           fetch-depth: ${{ endsWith(matrix.job, 'lint') && 2 || endsWith(matrix.job, 'format') && 2 || 1 }}
       - name: Agent health check
+        # Set RUNNER_TRACKER_ID="" to prevent GitHub Actions from killing the Bazel server started
+        # during health check when "Cleaning up orphan processes" in the "Complete job" step.
+        # See https://github.com/actions/runner/issues/598.
         run: RUNNER_TRACKING_ID="" && ${{ fromJson(needs.setup.outputs.cfg).platform.directories.WORKFLOWS_BIN_DIR }}/agent_health_check
         timeout-minutes: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].health_check_timeout }}
       - name: Process secrets
@@ -76,23 +112,22 @@ jobs:
       - name: Prepare archive directories
         run: rm -rf ${{ join(fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].artifact_paths, ' ') }}
       - name: Checkout health
-        uses: aspect-build/workflows-action@5.14.21
+        uses: aspect-build/workflows-action@5.15.0
         timeout-minutes: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].checkout_task_timeout }}
         if: fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].has_checkout_task
         with:
           workspace: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].workspace }}
           task: checkout
       - name: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].name }}
-        uses: aspect-build/workflows-action@5.14.21
-        # CORREÇÃO DE SINTAXE: O bloco 'env' é uma chave/valor YAML. A expressão precisa ser o VALOR, não a CHAVE.
-        env:
-          ${{ inputs.inherited_secrets != '' && fromJson(steps.process_secrets.outputs.filtered_secrets) || fromJson('{}') }}
+        uses: aspect-build/workflows-action@5.15.0
+        env: ${{ inputs.inherited_secrets != '' && fromJson(steps.process_secrets.outputs.filtered_secrets) || fromJson('{}') }}
         timeout-minutes: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].timeout_in_minutes }}
         with:
           workspace: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].workspace }}
           task: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].task }}
       - name: Send notification to Slack
         id: slack
+        # oncall cares about branches that do delivery, so key this on whether we produce a delivery manifest
         if: inputs.slack_webhook_url != '' && failure() && fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].generate_manifest
         uses: slackapi/slack-github-action@v1.27.0
         with:
@@ -104,7 +139,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets[inputs.slack_webhook_url] }}
       - name: Delivery manifest
         if: fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].generate_manifest
-        uses: aspect-build/workflows-action@5.14.21
+        uses: aspect-build/workflows-action@5.15.0
         timeout-minutes: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].delivery_manifest_timeout }}
         with:
           workspace: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].workspace }}
@@ -112,10 +147,12 @@ jobs:
           args: "--data TARGETS_SOURCE=${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].task }}"
       # Upload all artifacts for the workspace
       - name: Upload artifacts
+        # The `always()` condition makes this step run even if a previous step failed.
+        # Setting `continue-on-error: true` on previous steps isn't ideal as the UI
+        # will flag them as having passed even if they failed.
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          # CORREÇÃO DE SINTAXE: 'path' e 'name' são chaves/valores fixos.
           name: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].artifact_prefix }}${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].task }}.artifacts
           path: ${{ fromJson(needs.setup.outputs.cfg).workflows_config[matrix.job].artifact_upload_pattern }}
           overwrite: true
@@ -130,7 +167,11 @@ jobs:
         with:
           files: bazel-out/_coverage/_coverage_report.dat
           token: ${{ secrets.CODECOV_TOKEN }}
+          functionalities: search # Disable searching for coverage reports. If enabled, it gets confused
+          # by the bazel convenience symlinks and finds the same coverage report
+          # under bazel-out and {workspace}/bazel-out.
       - name: Trigger delivery
+        # This uses the following API: https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
         run: |
           curl \
             -X POST \
