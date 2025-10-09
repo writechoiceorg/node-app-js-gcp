@@ -29,20 +29,6 @@ jobs:
           name: Build
           command: rosetta run build --workspace << parameters.workspace >>
           no_output_timeout: 180m
-      - when:
-          condition:
-            and:
-              - <<parameters.delivery_manifest>>
-              - or:
-                  - matches:
-                      pattern: ^main$
-                      value: << pipeline.git.branch >>
-          steps:
-            - run:
-                name: Delivery manifest
-                command: rosetta run delivery_manifest --workspace << parameters.workspace >>
-                  --data TARGETS_SOURCE=build
-                no_output_timeout: 180m
       - store_artifacts:
           path: /workflows/testlogs
       - store_artifacts:
@@ -55,9 +41,6 @@ jobs:
     parameters: &a1
       workspace:
         type: string
-      delivery_manifest:
-        type: boolean
-        default: true
     environment:
       ASPECT_WORKFLOWS_CIRCLE_PIPELINE_NUMBER: << pipeline.number >>
       ASPECT_WORKFLOWS_CIRCLE_PIPELINE_PROJECT_TYPE: << pipeline.project.type >>
@@ -87,20 +70,6 @@ jobs:
           no_output_timeout: 180m
       - store_test_results:
           path: /workflows/testlogs
-      - when:
-          condition:
-            and:
-              - <<parameters.delivery_manifest>>
-              - or:
-                  - matches:
-                      pattern: ^main$
-                      value: << pipeline.git.branch >>
-          steps:
-            - run:
-                name: Delivery manifest
-                command: rosetta run delivery_manifest --workspace << parameters.workspace >>
-                  --data TARGETS_SOURCE=test
-                no_output_timeout: 180m
       - store_artifacts:
           path: /workflows/testlogs
       - store_artifacts:
@@ -118,5 +87,10 @@ jobs:
       ASPECT_WORKFLOWS_CONFIG: .aspect/workflows/config.yaml
       ASPECT_WORKFLOWS_WORKSPACE: << parameters.workspace >>
       XDG_CACHE_HOME: /mnt/ephemeral/caches
+parameters:
+  workspace:
+    default: .
+    description: The workspace that the `delivery_targets` live within.
+    type: string
 orbs:
   workflows: aspect-build/workflows@5.8.18
