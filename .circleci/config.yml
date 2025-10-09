@@ -1,20 +1,122 @@
-# .circleci/config.yaml
-# Using orbs for reusable CircleCI configuration
-
 version: 2.1
-
+workflows:
+  aspect-workflows:
+    jobs:
+      - aw-build:
+          workspace: .
+          context: []
+      - aw-test:
+          workspace: .
+          context: []
+jobs:
+  aw-build:
+    machine: true
+    resource_class: writechoiceorg/aspect-default
+    working_directory: /mnt/ephemeral/workdir
+    steps:
+      - run:
+          name: Workflows environment
+          command: /etc/aspect/workflows/bin/configure_workflows_env
+      - checkout
+      - run:
+          name: Prepare archive directories
+          command: rm -rf /workflows/artifacts /workflows/testlogs
+      - run:
+          name: Agent health check
+          command: /etc/aspect/workflows/bin/agent_health_check
+          no_output_timeout: 180m
+      - run:
+          name: Build
+          command: rosetta run build --workspace << parameters.workspace >>
+          no_output_timeout: 180m
+      - when:
+          condition:
+            and:
+              - <<parameters.delivery_manifest>>
+              - or:
+                  - matches:
+                      pattern: ^main$
+                      value: << pipeline.git.branch >>
+          steps:
+            - run:
+                name: Delivery manifest
+                command: rosetta run delivery_manifest --workspace << parameters.workspace >>
+                  --data TARGETS_SOURCE=build
+                no_output_timeout: 180m
+      - store_artifacts:
+          path: /workflows/testlogs
+      - store_artifacts:
+          path: /workflows/artifacts
+      - run:
+          name: Finalization
+          command: rosetta run finalization
+          no_output_timeout: 10m
+          when: always
+    parameters: &a1
+      workspace:
+        type: string
+      delivery_manifest:
+        type: boolean
+        default: true
+    environment:
+      ASPECT_WORKFLOWS_CIRCLE_PIPELINE_NUMBER: << pipeline.number >>
+      ASPECT_WORKFLOWS_CIRCLE_PIPELINE_PROJECT_TYPE: << pipeline.project.type >>
+      ASPECT_WORKFLOWS_CIRCLE_WORKFLOW_BASE_NAME: aspect-workflows
+      ASPECT_WORKFLOWS_CONFIG: .aspect/workflows/config.yaml
+      ASPECT_WORKFLOWS_WORKSPACE: << parameters.workspace >>
+      XDG_CACHE_HOME: /mnt/ephemeral/caches
+  aw-test:
+    machine: true
+    resource_class: writechoiceorg/aspect-default
+    working_directory: /mnt/ephemeral/workdir
+    steps:
+      - run:
+          name: Workflows environment
+          command: /etc/aspect/workflows/bin/configure_workflows_env
+      - checkout
+      - run:
+          name: Prepare archive directories
+          command: rm -rf /workflows/artifacts /workflows/testlogs
+      - run:
+          name: Agent health check
+          command: /etc/aspect/workflows/bin/agent_health_check
+          no_output_timeout: 180m
+      - run:
+          name: Test
+          command: rosetta run test --workspace << parameters.workspace >>
+          no_output_timeout: 180m
+      - store_test_results:
+          path: /workflows/testlogs
+      - when:
+          condition:
+            and:
+              - <<parameters.delivery_manifest>>
+              - or:
+                  - matches:
+                      pattern: ^main$
+                      value: << pipeline.git.branch >>
+          steps:
+            - run:
+                name: Delivery manifest
+                command: rosetta run delivery_manifest --workspace << parameters.workspace >>
+                  --data TARGETS_SOURCE=test
+                no_output_timeout: 180m
+      - store_artifacts:
+          path: /workflows/testlogs
+      - store_artifacts:
+          path: /workflows/artifacts
+      - run:
+          name: Finalization
+          command: rosetta run finalization
+          no_output_timeout: 10m
+          when: always
+    parameters: *a1
+    environment:
+      ASPECT_WORKFLOWS_CIRCLE_PIPELINE_NUMBER: << pipeline.number >>
+      ASPECT_WORKFLOWS_CIRCLE_PIPELINE_PROJECT_TYPE: << pipeline.project.type >>
+      ASPECT_WORKFLOWS_CIRCLE_WORKFLOW_BASE_NAME: aspect-workflows
+      ASPECT_WORKFLOWS_CONFIG: .aspect/workflows/config.yaml
+      ASPECT_WORKFLOWS_WORKSPACE: << parameters.workspace >>
+      XDG_CACHE_HOME: /mnt/ephemeral/caches
 orbs:
   workflows: aspect-build/workflows@5.8.18
-
-workflows:
-  bazel_ci_workflow:
-    jobs:
-      - workflows/aspect-workflows:
-
-          resource-class: writechoiceorg/aspect-default 
-          filters:
-            branches:
-              only:
-                - main
-            tags:
-              ignore: /.*/
