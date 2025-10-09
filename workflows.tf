@@ -18,14 +18,14 @@ source = "https://static.aspect.build/aspect/5.14.12/terraform-gcp-aspect-workfl
     # Ask Aspect about right sizing remote cache size & throughput for your build.
     standard_nodes = {
       min_count    = 1
-      max_count    = 20
+      max_count    = 5
       machine_type = "e2-standard-4"
     }
     # WORKFLOWS_TEMPLATE: Customize your remote cache size.
     # Ask Aspect about right sizing the remote cache size & throughput for your build.
     remote_cache_nodes = {
       # 3 shards with 375GiB SSDs each = 1.125TiB cache size
-      count        = 3
+      count        = 1
       machine_type = "c3-standard-4-lssd"
     }
     # WORKFLOWS_TEMPLATE: Uncomment the `remote_exec_nodes` block to enable remote execution.
@@ -46,7 +46,7 @@ remote = {
     }
 cache = {
       # WORKFLOWS_TEMPLATE: `shards` should match `k8s_cluster.remote_cache_nodes.count` above.
-      shards = 3
+      shards = 1
     }
     # WORKFLOWS_TEMPLATE: Uncomment the `remote_execution` block to enable remote execution.
     # Ask Aspect about right sizing the remote execution cluster to your workloads.
@@ -108,7 +108,7 @@ machine_type = "c2d-standard-4"
   gha_runner_groups = {
     # The `default` runner group is used for general bazel tasks such as build & test.
     default = {
-      agent_idle_timeout_min    = 120
+      agent_idle_timeout_min    = 30
       gh_repo                   = "writechoiceorg/node-app-js-gcp" # `org/repo` of the GitHub repository under test
       gha_workflow_ids          = [194627850, 192221730] # WORKFLOWS_TEMPLATE: to reduce GitHub API call frequency and prevent rate limiting, add the workflow ID of the Aspect Workflows main GitHub Action
       max_runners               = 50
@@ -122,7 +122,7 @@ machine_type = "c2d-standard-4"
     # These are intentionally small, inexpensive, long-lived instances that are not
     # meant for running bazel tasks.
     small = {
-      agent_idle_timeout_min    = 720
+      agent_idle_timeout_min    = 30
       gh_repo                   = "writechoiceorg/node-app-js-gcp" # `org/repo` of the GitHub repository under test
       gha_workflow_ids          = [194627850, 192221730] # WORKFLOWS_TEMPLATE: to reduce GitHub API call frequency and prevent rate limiting, add the workflow ID of the Aspect Workflows main GitHub Action
       max_runners               = 4
@@ -150,8 +150,8 @@ machine_type = "c2d-standard-4"
   cci_runner_groups = {
     # The `default` runner group is used for general bazel tasks such as build & test.
     default = {
-      agent_idle_timeout_min    = 120
-      max_runners               = 50
+      agent_idle_timeout_min    = 30
+      max_runners               = 5
       min_runners               = 0
       resource_type             = "default"
       scaling_polling_frequency = 2 # check for new jobs every 30s
@@ -171,8 +171,8 @@ machine_type = "c2d-standard-4"
   bk_runner_groups = {
     # The `default` runner group is used for general bazel tasks such as build & test.
     default = {
-      agent_idle_timeout_min    = 120
-      max_runners               = 50
+      agent_idle_timeout_min    = 30
+      max_runners               = 5
       min_runners               = 0
       queue                     = "aspect-default"
       resource_type             = "default"
@@ -189,7 +189,7 @@ machine_type = "c2d-standard-4"
     # These are intentionally small, inexpensive, long-lived instances that are not
     # meant for running bazel tasks.
     small = {
-      agent_idle_timeout_min    = 720
+      agent_idle_timeout_min    = 30
       max_runners               = 4
       min_runners               = 0
       queue                     = "aspect-small"
