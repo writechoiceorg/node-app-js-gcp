@@ -7,5 +7,5 @@
 # build a custom base image for Aspect Workflows.
 data "google_compute_image" "runner_image" {
   project = "aspect-workflows-images"
-  name    = "aspect-workflows-debian-12-kitchen-sink-amd64-20250613-0"
+  name    = "aspect-workflows-debian-12-kitchen-sink-amd64-20251013-0"
 }
